@@ -26,7 +26,7 @@ them. UK payroll needs HMRC recognition (HUMAN_TODO), which has its own lead tim
 ## ADR-0002 — Stack and platform kit (2026-11-07)
 
 **Context.** Thapsus-HR already runs the three-region cell model on Google Cloud with OpenTofu, forced RLS and
-Cloud SQL; most shared code is extracted from it into the `thapsus-platform` repository (D-9, D-10).
+Cloud SQL; most shared code is extracted from it into the `PROJECT_ATLAS` repository (D-9, D-10).
 
 **Decision.** TypeScript, pnpm and Turborepo; `apps/web` (Next.js App Router, installable PWA), `apps/api`
 (Fastify, TypeBox route schemas as the OpenAPI 3.1 source, `/v1`), `apps/worker` (outbox, idempotent jobs, close

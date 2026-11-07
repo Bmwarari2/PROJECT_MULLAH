@@ -23,8 +23,9 @@ Until then, only planning documents change. Read first: `docs/PLAN.md`, `docs/FE
   recurring cost beyond the estimate in `docs/COSTS.md`.
 - Never tick a PLAN item whose acceptance criteria are not proved by a test or a check in `pnpm verify`, or
   (for human-only items) by an entry in HUMAN_TODO. Report failures and skipped steps honestly.
-- Suite documents in `docs/suite/` are identical in PROJECT_MULLAH, PROJECT_BOSSMAN and PROJECT_KASONGO. Change
-  all three copies in one change until the `thapsus-platform` repository holds the single copy.
+- Suite documents in `docs/suite/` are a read-only mirror of `PROJECT_ATLAS/docs/suite/`, the canonical copy (the
+  suite's platform repository). Change them in PROJECT_ATLAS, then copy them here and to the other two mirrors
+  (PROJECT_MULLAH, PROJECT_BOSSMAN, PROJECT_KASONGO) in the same change.
 
 ## Scope guardrails
 
@@ -115,4 +116,4 @@ suite's native phase (ship an installable PWA).
 ## Key documents
 
 `docs/BUILD_BRIEF.md` (draft scope) · `docs/PLAN.md` · `docs/FEATURES.md` · `docs/RESEARCH.md` ·
-`docs/DECISIONS.md` · `docs/HUMAN_TODO.md` · `docs/suite/` (suite plan, integration, platform, Studio, AI, design)
+`docs/DECISIONS.md` · `docs/HUMAN_TODO.md` · `docs/suite/` (mirror of PROJECT_ATLAS: suite plan, integration, platform, Studio, AI, design)

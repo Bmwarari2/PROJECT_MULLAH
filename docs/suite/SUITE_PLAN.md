@@ -1,7 +1,7 @@
 # Thapsus suite plan
 
-> Suite document, kept identical in `PROJECT_MULLAH`, `PROJECT_BOSSMAN` and `PROJECT_KASONGO` until the
-> shared `thapsus-platform` repository exists (HUMAN_TODO H-S1). Change all three copies in the same change.
+> Suite document. The canonical copy is `PROJECT_ATLAS/docs/suite/`; `PROJECT_MULLAH`, `PROJECT_BOSSMAN` and
+> `PROJECT_KASONGO` keep read-only mirrors. Change it in PROJECT_ATLAS, then copy it to the three mirrors in the same change.
 > Status: plan for owner approval, 2026-11-07. Research behind it: each product's `docs/RESEARCH.md` and
 > `docs/suite/RESEARCH_PLATFORM.md`.
 
@@ -40,7 +40,7 @@ Defaults taken where the owner was not asked (each can be changed by the owner; 
 | --- | --- | --- |
 | D-8 | Product names | Thapsus Finance, Thapsus CRM, Thapsus ERP (working names) |
 | D-9 | Stack for the new products | Thapsus-HR's stack (TypeScript, pnpm and Turborepo, Next.js App Router PWA, Fastify with TypeBox and OpenAPI 3.1, PostgreSQL 17 on Cloud SQL with forced row-level security, OpenTofu cells), because the new products share HR's three-region model and most shared code is extracted from HR |
-| D-10 | Shared code | A new `thapsus-platform` repository publishing `@thapsus-suite/*` packages (H-S1). Products consume pinned versions |
+| D-10 | Shared code | The shared repository `PROJECT_ATLAS` (named and created by the owner on 2026-11-07, H-S1) publishes `@thapsus-suite/*` packages and holds the canonical suite documents. Products consume pinned versions |
 | D-11 | Data ownership between products | One owner per kind of data per tenant, defaults in `INTEGRATION.md` §4 |
 | D-12 | One ledger | Finance holds the only general ledger. ERP, CRM and Care send accounting events; ERP never builds its own ledger |
 | D-13 | AI | Every AI feature is off by default at three levels (Thapsus availability per region, tenant owner, feature) and drafts for a person to approve; nothing changes state on model output alone (`AI.md`) |
@@ -124,7 +124,7 @@ audits), which code speed does not shorten.
 
 | Stage | Indicative window | Platform | Finance | CRM | ERP | HR and Care |
 | --- | --- | --- | --- | --- | --- | --- |
-| 0. Platform kit | Nov 2026 – Jan 2027 | Create `thapsus-platform`; extract core, db, audit, auth, authz, api-kit, jobs, flags, tokens, ui, shell; Studio v1 (custom fields, objects, layouts, validation, automation); Thapsus ID v1; AI gateway skeleton (off); OpenTofu modules | Phase 0 scaffold on the kit as packages land | Phase 0 | Phase 0 | No change; HR exports its extracted modules (no behaviour change) |
+| 0. Platform kit | Nov 2026 – Jan 2027 | `PROJECT_ATLAS` (its `docs/PLAN.md`, phases A0–A6 here): extract core, db, audit, auth, authz, api-kit, jobs, flags, tokens, ui, shell; Studio v1 (custom fields, objects, layouts, validation, automation); Thapsus ID v1; AI gateway skeleton (off); OpenTofu modules | Phase 0 scaffold on the kit as packages land | Phase 0 | Phase 0 | No change; HR exports its extracted modules (no behaviour change) |
 | 1. Product cores | Dec 2026 – Mar 2027 | Studio v2 (workflows, approvals, templates, report builder); suite events | Ledger, sales, purchases, banking | Records, pipeline, email and calendar | Items, inventory, purchasing, sales orders against the ledger mock | — |
 | 2. UK depth | Mar – Jun 2027 | Suite inbox; Thapsus ID SSO across products | UK VAT and MTD, reporting and close, expenses, fixed assets | Service desk, marketing, quotes and CPQ | Warehouse, manufacturing (discrete and process), quality, projects | Design token bridge in HR and Care |
 | 3. Suite links and pilots | May – Aug 2027 | Embedded cards, capability negotiation | Posting contract live with ERP; links to HR, CRM, Care | Links to Finance, ERP, HR | Ledger mock replaced by Finance | HR: partner events, Finance and ERP links, shell and app switcher. Care: Finance as accounting target; shell |
@@ -141,7 +141,7 @@ These take calendar time that code cannot shorten. Each product's `docs/HUMAN_TO
 
 | Item | Product | Why it gates | Start by |
 | --- | --- | --- | --- |
-| Create `thapsus-platform` repository and Artifact Registry npm repository | All | Nothing shared can be published without it | Stage 0, week 1 |
+| Shared repository (**done 2026-11-07: `PROJECT_ATLAS`**) and its Artifact Registry npm repository (still to create) | All | Nothing shared can be published without it | Stage 0, week 1 |
 | Google Cloud projects, folders, organisation policies and billing per product and cell | All | Staging and production | Stage 0 |
 | HMRC developer hub, MTD VAT sandbox and production credentials, recognition listing | Finance | UK launch | Stage 1 |
 | Open banking aggregator contract (UK first) and its DPA | Finance | Bank feeds | Stage 1 |
@@ -174,12 +174,12 @@ These take calendar time that code cannot shorten. Each product's `docs/HUMAN_TO
 ## 8. How the build is run
 
 - One **lead session** coordinates the suite, merges batches and keeps this plan current.
-- One **platform session** builds `thapsus-platform`; one **product session** per new product; HR and Care keep
+- One **platform session** builds `PROJECT_ATLAS`; one **product session** per new product; HR and Care keep
   their own sessions, which take suite work only as planned slices.
 - Each product repository has its own `CLAUDE.md`, `docs/BUILD_BRIEF.md`, `docs/PLAN.md` (phases with
   acceptance criteria), `docs/DECISIONS.md`, `docs/HUMAN_TODO.md` and `docs/RESEARCH.md`.
-- A change to a suite document is made in all three copies in one change until the platform repository holds
-  the single copy.
+- Suite documents are changed only in `PROJECT_ATLAS/docs/suite/` (the canonical copy) and then copied, in the same
+  change, to the read-only mirrors in the three product repositories.
 - Work goes phase by phase; a phase is done only when its acceptance criteria are proved by tests or checks,
   with human-only items recorded in HUMAN_TODO.
 
@@ -196,6 +196,7 @@ These take calendar time that code cannot shorten. Each product's `docs/HUMAN_TO
 | `HUMAN_TODO_SUITE.md` | Steps only a person can take for the whole suite |
 | `RESEARCH_PLATFORM.md` | Research behind the platform choices, with sources |
 
-Each product repository adds its own `docs/PLAN.md`, `docs/FEATURES.md`, `docs/BUILD_BRIEF.md` (draft),
+PROJECT_ATLAS has its own `docs/PLAN.md` for the platform kit (phases A0 to A11). Each product repository adds its
+own `docs/PLAN.md`, `docs/FEATURES.md`, `docs/BUILD_BRIEF.md` (draft),
 `docs/RESEARCH.md`, `docs/DECISIONS.md` and `docs/HUMAN_TODO.md`. Thapsus-HR and Thapsus Care have their own plans for
 joining the suite: `PROJECT_KAREN/docs/SUITE_INTEGRATION_PLAN.md` and `ROCHE/docs/plans/thapsus-suite.md`.

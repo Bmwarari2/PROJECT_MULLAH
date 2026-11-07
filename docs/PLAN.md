@@ -296,7 +296,7 @@ staging in each region before its production cell; runbooks.
 
 | Needs | From | By phase |
 | --- | --- | --- |
-| Platform kit (core, db, auth, Studio, shell, vault) | `thapsus-platform` | 0 |
+| Platform kit (core, db, auth, Studio, shell, vault) | `PROJECT_ATLAS` | 0 |
 | Employees, approvers, bank details for reimbursement | Thapsus-HR partner scopes (`PROJECT_KAREN/docs/SUITE_INTEGRATION_PLAN.md` S.5, S.6) | 7 (mock), 16 |
 | Customer master | CRM | 2 (local), 16 |
 | PO and receipt facts | ERP | 3 (local light POs), 16 |

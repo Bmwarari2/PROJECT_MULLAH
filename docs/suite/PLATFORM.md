@@ -1,7 +1,7 @@
 # Thapsus suite platform (plan)
 
-> Suite document, kept identical in `PROJECT_MULLAH`, `PROJECT_BOSSMAN` and `PROJECT_KASONGO` until the
-> shared `thapsus-platform` repository exists (HUMAN_TODO H-S1). Change all three copies in the same change.
+> Suite document. The canonical copy is `PROJECT_ATLAS/docs/suite/`; `PROJECT_MULLAH`, `PROJECT_BOSSMAN` and
+> `PROJECT_KASONGO` keep read-only mirrors. Change it in PROJECT_ATLAS, then copy it to the three mirrors in the same change.
 > Status: plan for owner approval, 2026-11-07. Research: `RESEARCH_PLATFORM.md`.
 
 This document covers what every product shares below the business features: the platform repository,
@@ -11,7 +11,7 @@ ADR-0098).
 
 ## 1. The platform repository
 
-- **Repository**: `thapsus-platform` (to be created, H-S1), a pnpm and Turborepo monorepo of `@thapsus-suite/*`
+- **Repository**: `Bmwarari2/PROJECT_ATLAS` (created by the owner on 2026-11-07, H-S1), a pnpm and Turborepo monorepo of `@thapsus-suite/*`
   packages (list in `SUITE_PLAN.md` §4), OpenTofu modules and the Thapsus ID and suite services.
 - **Publishing**: a private npm repository in Artifact Registry (europe-west2). CI publishes with workload identity
   federation; products install through the same route. No tokens or keys in any repository.

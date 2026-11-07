@@ -1,7 +1,7 @@
 # Thapsus suite integration contract (plan)
 
-> Suite document, kept identical in `PROJECT_MULLAH`, `PROJECT_BOSSMAN` and `PROJECT_KASONGO` until the
-> shared `thapsus-platform` repository exists (HUMAN_TODO H-S1). Change all three copies in the same change.
+> Suite document. The canonical copy is `PROJECT_ATLAS/docs/suite/`; `PROJECT_MULLAH`, `PROJECT_BOSSMAN` and
+> `PROJECT_KASONGO` keep read-only mirrors. Change it in PROJECT_ATLAS, then copy it to the three mirrors in the same change.
 > Status: plan for owner approval, 2026-11-07.
 
 The owner's requirement: a client that buys more than one Thapsus product gets products that work with each

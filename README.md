@@ -18,7 +18,7 @@ by default, and Google Cloud home regions in London, Frankfurt and Iowa.
 | [`docs/RESEARCH.md`](docs/RESEARCH.md) | Market and regulatory research with sources and dates checked |
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | Decisions so far (owner decisions and architecture records) |
 | [`docs/HUMAN_TODO.md`](docs/HUMAN_TODO.md) | Steps only a person can take |
-| [`docs/suite/`](docs/suite/SUITE_PLAN.md) | The suite plan shared by every Thapsus product: integration, platform, Studio, AI, design |
+| [`docs/suite/`](docs/suite/SUITE_PLAN.md) | The suite plan shared by every Thapsus product (read-only mirror of `PROJECT_ATLAS/docs/suite/`): integration, platform, Studio, AI, design |
 
 ## Licence
 

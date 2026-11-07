@@ -1,18 +1,21 @@
 # Suite: steps only a person can take
 
-> Suite document, kept identical in `PROJECT_MULLAH`, `PROJECT_BOSSMAN` and `PROJECT_KASONGO` until the
-> shared `thapsus-platform` repository exists. Product-specific steps are in each product's `docs/HUMAN_TODO.md`.
-> Status: 2026-11-07. Nothing here has been done yet.
+> Suite document. The canonical copy is `PROJECT_ATLAS/docs/suite/`; `PROJECT_MULLAH`, `PROJECT_BOSSMAN` and
+> `PROJECT_KASONGO` keep read-only mirrors. Product-specific steps are in each product's `docs/HUMAN_TODO.md`.
+> Status: 2026-11-07. H-S1 is done (the repository exists as `PROJECT_ATLAS`); its remaining sub-steps are marked.
 
 Order matters: H-S1 to H-S4 unblock the platform kit (Stage 0 of `SUITE_PLAN.md`).
 
-## H-S1 Create the shared platform repository
+## H-S1 Create the shared platform repository — done 2026-11-07 (`Bmwarari2/PROJECT_ATLAS`)
 
-1. On GitHub, create a **private** repository `Bmwarari2/thapsus-platform` with a `main` branch and no template.
-2. Protect `main`: pull requests required, linear history, required status checks (added once CI exists).
-3. Install the Claude GitHub App on it (GitHub → Settings → Applications → Claude → Repository access).
-4. Add it to the Claude Code sessions that build the suite (lead, platform and product sessions).
-5. Tell the lead session, which moves the `docs/suite/` documents there and replaces the three copies with links.
+1. ~~Create a private repository~~ Done: the owner created `Bmwarari2/PROJECT_ATLAS` (empty, private).
+2. ~~Install the Claude GitHub App and add the repository to the planning session~~ Done: it is attached to the
+   planning session, which pushed the plan to branch `claude/thapsus-systems-dev-plan-2rkfaj`.
+3. Still to do: once that branch is merged, make `main` the default branch and protect it (pull requests required,
+   linear history, required status checks once CI exists).
+4. Still to do: add PROJECT_ATLAS to the lead session and to the platform and product build sessions.
+5. Done: the suite documents now live canonically in `PROJECT_ATLAS/docs/suite/`; the product repositories keep
+   read-only mirrors (PROJECT_ATLAS `docs/DECISIONS.md` ADR-0004).
 
 ## H-S2 Approve the cost estimate before anything is deployed
 
