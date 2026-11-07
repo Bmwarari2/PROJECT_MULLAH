@@ -80,7 +80,7 @@ People should sign in once and move between the products their organisation uses
 | --- | --- | --- | --- |
 | UK | europe-west2 (London) | None outside London; across zones only | Every product, including Care |
 | EU | europe-west3 (Frankfurt) | europe-west1 (Belgium) only | Finance, CRM, ERP, HR |
-| US | us-east5 (Columbus, Ohio) | us-west1 (Oregon) only | Finance, CRM, ERP, HR |
+| US | us-central1 (Iowa) | us-west1 (Oregon) only | Finance, CRM, ERP, HR. Moved from us-east5 by owner decision D-16 (2026-11-07), see §5.1a |
 | Global layer | europe-west2 | — | Suite directory, suite billing, marketing sites; no personal data |
 
 The organisation policy `gcp.resourceLocations` is set per cell folder so that a resource elsewhere cannot be
@@ -89,6 +89,36 @@ package as a second guard-rail. Identity Platform is not used (it is not on Goog
 ID stores sign-in data in the cell's own database. The same map lives in `@thapsus-suite/core` and every Google client goes through the residency guard.
 Production cells for EU and US are defined in code from day one, but deployed only when the first customer in
 that region signs (D-1, and to avoid recurring cost before it is needed).
+
+### 5.1a Why the US cell is in us-central1 (owner decision D-16, 2026-11-07)
+
+The US cell was planned in us-east5 (Columbus), chosen to mirror AWS us-east-2 (Ohio). On 2026-11-07 the owner
+allowed the US cell to be in any compatible US region. Facts checked that day on Google's own pages:
+
+| Need | us-east5 (Columbus) | us-central1 (Iowa) | us-east4 (N. Virginia) |
+| --- | --- | --- | --- |
+| Cloud Scheduler, Cloud Tasks | **No** | Yes | Yes |
+| Cloud SQL Enterprise Plus, N2 machines (HR's `db-perf-optimized-N-*`) | Yes | Yes | Yes |
+| Cloud Run, worker pools, regional Secret Manager | Yes | Yes | Yes |
+| Cloud Run GPUs (for self-hosted OCR or small models later) | No | Yes (L4, RTX PRO 6000) | Yes (L4) |
+| Eventarc Advanced | No | Yes | Yes |
+| Document AI as a single region | No | **Yes** (the only US region: Layout Parser, generative custom extractor, classifier, splitter) | No |
+| Gemini 2.5 Pro, Flash, Flash-Lite and the embedding models | Yes | Yes | Yes |
+| Claude (Sonnet 4.6, Opus 4.6, Haiku 4.5) on a regional endpoint | **Yes (the only US region)** | No | No |
+| Where Google processes generative AI requests | US multi-region, for every US regional endpoint | Same | Same |
+
+**Decision.** The US cell runs in **us-central1 (Iowa)**, the only candidate with every service the suite uses,
+including Document AI. Backups and replicas stay in **us-west1 (Oregon)**. The US residency promise becomes "in the
+United States": all of a US tenant's data, files, backups, logs, caches and queues stay in us-central1 and us-west1.
+Generative AI requests may also go to the **us-east5** regional endpoint for Claude, because Claude has no regional
+endpoint in Iowa. Google processes requests from every US regional endpoint within the US multi-region anyway, so
+this does not weaken where the data is processed. The email path is unchanged: Amazon SES in us-east-2, also in the
+US.
+
+**Consequences.** The suite's US cell can use Cloud Scheduler to trigger workers, as Thapsus-HR does today (§5.3).
+Thapsus-HR's US production cell is not deployed yet, so it moves with no data migration; its change list is in
+`PROJECT_KAREN/docs/SUITE_INTEGRATION_PLAN.md` §4a. The organisation policy for the US folders becomes
+`in:us-central1-locations` and `in:us-west1-locations`.
 
 ### 5.2 Projects
 
@@ -103,9 +133,9 @@ projects give each product its own blast radius, budget and IAM boundary.
 | --- | --- | --- |
 | Web, API, worker | Cloud Run services (web and API split into separate services with their own service accounts, the follow-up HR recorded in ADR-0248) | Minimum instances set per product |
 | Database | Cloud SQL for PostgreSQL 17 (as Thapsus-HR), Enterprise Plus in production with regional high availability, point-in-time recovery, private IP, CMEK, deletion protection; one instance per product per cell | Cloud SQL's default is now PostgreSQL 18 (built-in `uuidv7()`, skip scan); the suite moves to 18 together, by ADR. AlloyDB remains the upgrade path if a cell outgrows Cloud SQL |
-| Jobs and schedules | A PostgreSQL-backed job queue (HR's outbox drain and idempotent jobs; pg-boss in Care) and an **in-cell scheduler on a Cloud Run worker pool** with leader election through a PostgreSQL advisory lock | **Cloud Scheduler and Cloud Tasks are not offered in us-east5** and are not on Google's data-residency service list (checked 2026-11-07). Worker pools are GA (April 2026) in all three regions. This also affects Thapsus-HR's US cell, whose module creates a Cloud Scheduler job in the cell region |
+| Jobs and schedules | A PostgreSQL-backed job queue (HR's outbox drain and idempotent jobs; pg-boss in Care). **Cloud Scheduler in the cell's region** triggers each worker's drain, as Thapsus-HR does today | Cloud Scheduler is offered in all three cell regions now that the US cell is in us-central1 (§5.1a). Cloud Scheduler and Cloud Tasks are not on Google's data-residency service list, so a scheduler job carries no personal data (only a schedule and the worker's address), and job payloads live in PostgreSQL, never in Cloud Tasks |
 | Workflow runtime | Each product's own PostgreSQL (`STUDIO.md`) | Google Workflows is regional in all three cells but not tenant-isolated, so it is used only for infrastructure orchestration |
-| Suite events | Pub/Sub topics with a message storage policy limited to the cell's region and `enforceInTransit` on, published and consumed through regional endpoints; an organisation policy at folder level enforces in-transit locations | `INTEGRATION.md` §3. Eventarc Advanced is absent in europe-west2 and us-east5, so it is not used |
+| Suite events | Pub/Sub topics with a message storage policy limited to the cell's region and `enforceInTransit` on, published and consumed through regional endpoints; an organisation policy at folder level enforces in-transit locations | `INTEGRATION.md` §3. Eventarc Advanced is absent in europe-west2, so it is not used |
 | Analytics (later) | Regional BigQuery datasets in the cell, fed by application exports from the event stream | Not Datastream (not on the residency list); Gemini in BigQuery off for UK data (it processes globally outside the US and EU); Looker Studio not used for customer data |
 | Files | Cloud Storage, regional buckets, CMEK | |
 | Keys and secrets | Cloud KMS (regional key ring), Secret Manager (regional secrets) | |

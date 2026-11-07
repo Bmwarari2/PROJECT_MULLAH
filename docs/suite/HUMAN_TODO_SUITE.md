@@ -25,7 +25,7 @@ Order matters: H-S1 to H-S4 unblock the platform kit (Stage 0 of `SUITE_PLAN.md`
    `suite/production/uk`, and later `…/eu`, `…/us` (only when a customer in that region signs).
 2. On each cell folder set the organisation policy `constraints/gcp.resourceLocations` to the cell's region group
    (`in:europe-west2-locations` for UK; EU `in:europe-west3-locations` and `in:europe-west1-locations` for backups;
-   US `in:us-east5-locations` and `in:us-west1-locations`), as Thapsus-HR's bootstrap does.
+   US `in:us-central1-locations` and `in:us-west1-locations`, per decision D-16), as Thapsus-HR's bootstrap does.
 3. Create one shared project `thapsus-suite-shared` in `europe-west2` for Artifact Registry and the global layer.
 4. Link every project to the billing account and set a budget alert on each (amount from `COSTS.md`).
 5. Run the platform's bootstrap script (written in Stage 0, modelled on Thapsus-HR's `infra/gcp/bootstrap.sh`)
@@ -38,8 +38,9 @@ Order matters: H-S1 to H-S4 unblock the platform kit (Stage 0 of `SUITE_PLAN.md`
 2. Ask the Google Cloud account team to confirm in writing: the in-UK ML processing of Gemini 3.5 Flash and Gemini
    4 Argon on europe-west2; whether Claude Sonnet 4.6 on europe-west1 processes in Belgium or across the EU; and
    any roadmap for a Claude endpoint in europe-west2 or europe-west3. Record the answers in `AI.md` §4.
-3. Note for Thapsus-HR: Cloud Scheduler and Cloud Tasks are not offered in us-east5, so HR's US cell needs its
-   scheduler replaced before that cell is deployed (lead session).
+3. Note for Thapsus-HR: by decision D-16 its US cell moves from us-east5 to us-central1 before that cell is
+   deployed (the lead session has the change list). If the US projects were already bootstrapped for us-east5, run
+   the bootstrap again with the new region before the first apply.
 
 ## H-S4 Domains
 

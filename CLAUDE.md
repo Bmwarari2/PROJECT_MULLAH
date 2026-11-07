@@ -50,7 +50,7 @@ suite's native phase (ship an installable PWA).
 - Thapsus is the processor; customers are controllers. Comply with UK GDPR and the Data Protection Act 2018 (as
   amended by the Data (Use and Access) Act 2025), EU GDPR and US state privacy laws.
 - Each tenant picks a home region: **UK = europe-west2**, **EU = europe-west3** (backups only in
-  europe-west1), **US = us-east5** (backups only in us-west1). All its personal and financial data, files,
+  europe-west1), **US = us-central1** (backups only in us-west1). All its personal and financial data, files,
   backups, logs, search indexes, caches, queues and emails stay there. The map lives in one module and is
   enforced by tests for every region pair.
 - Never use a multi-region location, Cloud CDN for authenticated traffic, Cloud Trace, Error Reporting or the

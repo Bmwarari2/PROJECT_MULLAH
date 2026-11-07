@@ -953,3 +953,30 @@ Pages fetched or read in this session (2026-11-07) are marked **[V]**. Search-su
 17. **PostgreSQL 18**: whether virtual generated columns can be indexed. I believe not.
 18. **Apple palette**: that `#0071e3`, `#1d1d1f`, `#f5f5f7` and `#86868b` are Apple.com's published values is from general knowledge.
 19. **Google's zero-data-retention and caching guidance** for Agent Platform models; prompt caching may store data, so check before enabling.
+
+---
+
+## Addendum (2026-11-07): choosing the US cell region
+
+Added after the owner allowed the US cell to run in any compatible US region (decision D-16, `PLATFORM.md` §5.1a).
+Every row below was read on Google's official pages on 2026-11-07. Model availability came from the raw HTML table of
+the Agent Platform "Deployments and endpoints" page, whose cells carry `aria-label="Supported"`.
+
+| Check | us-west1 | us-central1 | us-east1 | us-east4 | us-east5 | Source |
+| --- | --- | --- | --- | --- | --- | --- |
+| Cloud Scheduler | Yes | Yes | Yes | Yes | **No** | https://docs.cloud.google.com/scheduler/docs/locations |
+| Cloud Tasks | Yes | Yes | Yes | Yes | **No** | https://docs.cloud.google.com/tasks/docs/locations |
+| Cloud SQL Enterprise Plus, N2 machine series | Yes | Yes | Yes | Yes | Yes | https://docs.cloud.google.com/sql/docs/postgres/region-availability-overview |
+| Regional Secret Manager | Yes | Yes | n/c | Yes | Yes | https://docs.cloud.google.com/secret-manager/docs/locations |
+| Cloud Run GPUs | — | L4, RTX PRO 6000 | — | L4 | — | https://docs.cloud.google.com/run/docs/configuring/services/gpu |
+| Document AI single-region processors | — | Layout Parser, generative custom extractor, classifier, splitter | — | — | — | https://docs.cloud.google.com/document-ai/docs/regions |
+| Gemini 2.5 Pro, 2.5 Flash, 2.5 Flash-Lite | Yes | Yes | Yes | Yes | Yes | https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/locations |
+| Gemini 3.5–3.8 Flash, 3.1 Pro, 4 Argon | No | No | No | No | No | Same page |
+| `gemini-embedding-001`, text and multimodal embeddings | Yes | Yes | Yes | Yes | Yes | Same page |
+| Claude Sonnet 4.6, Opus 4.6, Haiku 4.5 (regional) | No | No | No | No | **Yes** | Same page; "Regional endpoints serve Claude Sonnet 4.6 and earlier models only" (https://platform.claude.com/docs/en/build-with-claude/claude-models-on-google-cloud/google-managed) |
+| Mistral OCR (partner model) | No | Yes | No | No | No | Same page |
+| ML processing for generative AI called on a US single-region endpoint | US multi-region | US multi-region | US multi-region | US multi-region | US multi-region | https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/data-residency |
+
+"n/c": not checked. "—": not offered. Conclusion: us-central1 is the only US region with every service the suite
+uses. The one gap is Claude, which is served regionally only in us-east5. Processing for every US regional endpoint is
+the US multi-region, so a cell in Iowa calling us-east5 keeps generative AI processing where it would have been anyway.

@@ -136,3 +136,21 @@ Every feature has a deterministic path that works without AI.
 
 **Consequences.** AI matching, capture and commentary are additive. Their evaluation suites run in CI and a
 failure blocks release of that feature.
+
+## ADR-0010 — The US cell runs in us-central1 (Iowa) (owner decision, 2026-11-07)
+
+**Context.** The US cell was planned in us-east5 (Columbus). Cloud Scheduler, Cloud Tasks and single-region Document
+AI are not offered there, which the suite needs. The owner allowed the US cell to run in any compatible US region
+(suite decision D-16).
+
+**Decision.** The US cell runs in **us-central1 (Iowa)**; backups and replicas stay in **us-west1 (Oregon)**. It is
+the only US region with every service this product uses, checked on Google's pages on 2026-11-07
+(`docs/suite/PLATFORM.md` §5.1a, `docs/suite/RESEARCH_PLATFORM.md` addendum). Generative AI in the US cell uses
+Gemini in us-central1, or Claude on the us-east5 regional endpoint, which is the only US region serving Claude
+regionally. Google processes requests to every US regional endpoint within the US multi-region, so the data stays in
+the United States either way.
+
+**Consequences.** The region map, the residency tests (every region pair) and the US settings files use us-central1
+and us-west1 from Phase 0. The residency guard allows us-east5 for the AI gateway's Claude endpoint only, and refuses
+it for every other resource. The US folders' organisation policy is `in:us-central1-locations` and
+`in:us-west1-locations`.

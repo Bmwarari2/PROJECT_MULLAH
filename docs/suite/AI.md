@@ -78,14 +78,15 @@ Vertex AI was renamed the **Gemini Enterprise Agent Platform** in April 2026; th
 | --- | --- | --- | --- | --- |
 | UK (europe-west2) | Gemini 3.5 Flash; Gemini 4 Argon for harder tasks | Gemini 3.5 Flash structured output; Document AI Form Parser for forms and tables | `text-multilingual-embedding-002` | In the UK for these models. **No Claude model has a London endpoint.** Claude for UK customers only through HR's existing pattern: an explicit, audited, customer-chosen opt-in to europe-west1 (Belgium) after legal review (HR ADR-0248) |
 | EU (europe-west3) | Gemini 3.5 Flash; Claude Sonnet 4.6 in europe-west1 (Belgium) by opt-in, as HR | Gemini 3.5 Flash | `gemini-embedding-001` or `text-multilingual-embedding-002` | In Germany for Gemini 3.5 Flash; EU for the others |
-| US (us-east5) | Claude Sonnet 4.6 or Gemini 2.5 Pro / 2.5 Flash | Gemini 2.5 Flash or Pro | `gemini-embedding-001` | Within the US multi-region boundary, not pinned to Ohio (stated in words, as HR does) |
+| US (us-central1, D-16) | Gemini 2.5 Pro / 2.5 Flash in us-central1; Claude Sonnet 4.6 on the **us-east5** regional endpoint (the only US region that serves Claude regionally) | Gemini 2.5 Flash or Pro; Document AI in us-central1 (Layout Parser, generative custom extractor, classifier, splitter) | `gemini-embedding-001` or the text embedding models in us-central1 | Within the US multi-region boundary for every US regional endpoint, so calling us-east5 from the Iowa cell does not change where processing happens (stated in words, as HR does) |
 
 Consequences for the design:
 - **Retrieval uses pgvector in the product's own database**, not Google's RAG Engine; Agent Runtime, Memory Bank,
   Sessions and Sandboxes are outside Google's data-location commitments and are not used for customer data.
-- **Document capture** uses in-region Gemini structured extraction, Document AI Form Parser where it exists
-  (europe-west2 and europe-west3; nothing in us-east5; its OCR is Preview only), and a CPU-only self-hosted OCR
-  service on Cloud Run as the fallback (Cloud Run has no GPUs in the three cell regions).
+- **Document capture** uses in-region Gemini structured extraction and Document AI where it exists in the cell (Form
+  Parser in europe-west2 and europe-west3, where its OCR is Preview only; Layout Parser, the generative custom
+  extractor, classifier and splitter in us-central1), with a self-hosted OCR service on Cloud Run as the fallback
+  (CPU-only in London and Frankfurt, which have no Cloud Run GPUs; us-central1 has them).
 - **Newer models are not regional.** Claude models after Sonnet 4.6 and the newest Gemini models run only on global
   or multi-region endpoints, which the suite forbids. Every feature therefore has an evaluation suite that lets it
   switch model per cell without code changes, and the model map is re-checked every quarter (Haiku 4.5, for example,

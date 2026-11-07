@@ -28,7 +28,7 @@ wait for the owner to start the build.
 
 As in `CLAUDE.md`: accounting integrity (double entry, immutable postings, database-enforced periods, minor units,
 gap-free numbering where required, traceability both ways); privacy and data residency (home regions UK
-europe-west2, EU europe-west3, US us-east5); security (forced RLS, bank-detail change control, MFA, audit, ASVS L2,
+europe-west2, EU europe-west3, US us-central1); security (forced RLS, bank-detail change control, MFA, audit, ASVS L2,
 PCI scope kept out, no keys); quality (WCAG 2.2 AA, i18n, tax rules as sourced and effective-dated data); the suite
 design system with Finance's accent; optional, draft-only AI.
 

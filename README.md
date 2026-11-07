@@ -6,7 +6,7 @@ about 10 to 2,000 staff. It covers ledger, sales and receivables, purchases and 
 It is sold on its own and as part of the Thapsus suite with Thapsus-HR (`PROJECT_KAREN`), Thapsus Care
 (`ROCHE`) and the other new products. Every product uses the same design system (each with its own accent;
 this product's is indigo), one sign-in, no-code customisation through Studio, optional AI features that are off
-by default, and Google Cloud home regions in London, Frankfurt and Ohio.
+by default, and Google Cloud home regions in London, Frankfurt and Iowa.
 
 **Status: planning (2026-11-07).** Nothing is built yet.
 

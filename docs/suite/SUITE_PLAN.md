@@ -47,6 +47,12 @@ Defaults taken where the owner was not asked (each can be changed by the owner; 
 | D-14 | Hosting | Google Cloud, one project per product per environment per cell, plus shared suite projects per cell (`PLATFORM.md` §5) |
 | D-15 | Sales model | Each product sold alone, plus suite bundles with one bill per organisation (`PLATFORM.md` §8) |
 
+Decided by the owner later on 2026-11-07:
+
+| # | Question | Decision |
+| --- | --- | --- |
+| D-16 | Where the US cell runs | The owner allowed any compatible US region. The US cell moves from us-east5 (Columbus) to **us-central1 (Iowa)**, the only US region with every service the suite uses (Cloud Scheduler and Tasks, Document AI, GPUs). Backups stay in us-west1 (Oregon). Claude is reached on the us-east5 regional endpoint, still in the US. Reasons and the checked facts: `PLATFORM.md` §5.1a. Applies to Thapsus-HR too (its plan, §4a) |
+
 ## 3. Architecture at a glance
 
 ```mermaid
@@ -56,7 +62,7 @@ flowchart TB
     BILL[Suite billing\nStripe Billing + Tax]
     MKT[Marketing sites]
   end
-  subgraph Cell["Each cell: UK europe-west2 · EU europe-west3 · US us-east5"]
+  subgraph Cell["Each cell: UK europe-west2 · EU europe-west3 · US us-central1"]
     ID[Thapsus ID\nsign-in, MFA, SSO, SCIM]
     BUS[[Pub/Sub suite events\nregional, storage policy = cell]]
     AIG[AI gateway\noff by default]
@@ -161,7 +167,7 @@ These take calendar time that code cannot shorten. Each product's `docs/HUMAN_TO
 | ERP breadth across four industries | Shallow product | Shared core first; each industry as a Studio solution pack with its own acceptance criteria; launch with wholesale first and add the others one by one |
 | Design convergence disrupts HR and Care | Visual regressions | Token bridge with visual diff review; no accent change; staged adoption |
 | AI regional availability on Google Cloud | No Claude model in London or Frankfurt; newer models are global or multi-region only; regional models retire | Region map with legal holds (as HR ADR-0248); Gemini in-region in the UK and EU; per-feature evaluation suites so a feature can change model per cell; deterministic non-AI path for every feature (`AI.md` §4) |
-| Google services missing in a cell region | Cloud Scheduler and Cloud Tasks are not offered in us-east5 (checked 2026-11-07); the US cell would fail to deploy them | In-cell scheduler on a Cloud Run worker pool and a PostgreSQL-backed queue in every product (`PLATFORM.md` §5.3). **Thapsus-HR's US cell is affected today** and has been told through the lead session |
+| Google services missing in a cell region | Cloud Scheduler and Cloud Tasks are not offered in us-east5 (checked 2026-11-07), so a US cell there would fail to deploy | Resolved by D-16: the US cell moves to us-central1, which has them. Thapsus-HR's US cell, not yet deployed, moves too (its plan §4a; the lead session has the change list). Any service a product adds is checked in all three cell regions first |
 | EU Data Act switching rules | From 12 January 2027 no switching charges; contracts need notice, transition, retrieval and export terms; configuration counts as exportable data | Full export, including configuration, in every product's Phase 0 acceptance; contract terms through legal review (HUMAN_TODO_SUITE H-S7) |
 | Cost of many Cloud SQL instances | Spend above plan | Shared suite projects; right-sized staging; deploy EU and US production cells only when the first customer there signs; ask before adding recurring cost |
 
