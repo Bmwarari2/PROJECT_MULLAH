@@ -84,7 +84,9 @@ People should sign in once and move between the products their organisation uses
 | Global layer | europe-west2 | — | Suite directory, suite billing, marketing sites; no personal data |
 
 The organisation policy `gcp.resourceLocations` is set per cell folder so that a resource elsewhere cannot be
-created. The same map lives in `@thapsus-suite/core` and every Google client goes through the residency guard.
+created, and each cell folder is also an Assured Workloads folder with the free UK, EU or US Data Boundary control
+package as a second guard-rail. Identity Platform is not used (it is not on Google's data-residency list); Thapsus
+ID stores sign-in data in the cell's own database. The same map lives in `@thapsus-suite/core` and every Google client goes through the residency guard.
 Production cells for EU and US are defined in code from day one, but deployed only when the first customer in
 that region signs (D-1, and to avoid recurring cost before it is needed).
 
@@ -99,10 +101,12 @@ projects give each product its own blast radius, budget and IAM boundary.
 
 | Need | Service | Notes |
 | --- | --- | --- |
-| Web, API, worker | Cloud Run services (web and API split into separate services with their own service accounts, the follow-up HR recorded in ADR-0248) | Minimum instances set per product; the worker's drain endpoint is called by Cloud Scheduler and Cloud Tasks |
-| Database | Cloud SQL for PostgreSQL 17, Enterprise Plus in production with regional high availability, point-in-time recovery, private IP, CMEK, deletion protection; one instance per product per cell | AlloyDB remains the upgrade path if a cell outgrows Cloud SQL |
-| Jobs and schedules | Cloud Tasks and Cloud Scheduler (regional) driving idempotent jobs; the transactional outbox in PostgreSQL | |
-| Suite events | Pub/Sub topics with a message storage policy limited to the cell's region, published and consumed through regional endpoints | `INTEGRATION.md` §3 |
+| Web, API, worker | Cloud Run services (web and API split into separate services with their own service accounts, the follow-up HR recorded in ADR-0248) | Minimum instances set per product |
+| Database | Cloud SQL for PostgreSQL 17 (as Thapsus-HR), Enterprise Plus in production with regional high availability, point-in-time recovery, private IP, CMEK, deletion protection; one instance per product per cell | Cloud SQL's default is now PostgreSQL 18 (built-in `uuidv7()`, skip scan); the suite moves to 18 together, by ADR. AlloyDB remains the upgrade path if a cell outgrows Cloud SQL |
+| Jobs and schedules | A PostgreSQL-backed job queue (HR's outbox drain and idempotent jobs; pg-boss in Care) and an **in-cell scheduler on a Cloud Run worker pool** with leader election through a PostgreSQL advisory lock | **Cloud Scheduler and Cloud Tasks are not offered in us-east5** and are not on Google's data-residency service list (checked 2026-11-07). Worker pools are GA (April 2026) in all three regions. This also affects Thapsus-HR's US cell, whose module creates a Cloud Scheduler job in the cell region |
+| Workflow runtime | Each product's own PostgreSQL (`STUDIO.md`) | Google Workflows is regional in all three cells but not tenant-isolated, so it is used only for infrastructure orchestration |
+| Suite events | Pub/Sub topics with a message storage policy limited to the cell's region and `enforceInTransit` on, published and consumed through regional endpoints; an organisation policy at folder level enforces in-transit locations | `INTEGRATION.md` §3. Eventarc Advanced is absent in europe-west2 and us-east5, so it is not used |
+| Analytics (later) | Regional BigQuery datasets in the cell, fed by application exports from the event stream | Not Datastream (not on the residency list); Gemini in BigQuery off for UK data (it processes globally outside the US and EU); Looker Studio not used for customer data |
 | Files | Cloud Storage, regional buckets, CMEK | |
 | Keys and secrets | Cloud KMS (regional key ring), Secret Manager (regional secrets) | |
 | Logs and metrics | Cloud Logging with regional log buckets (never `_Default`), Cloud Monitoring, OpenTelemetry with personal data scrubbed | No Cloud Trace or Error Reporting |

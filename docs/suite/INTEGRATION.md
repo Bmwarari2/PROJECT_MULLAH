@@ -66,7 +66,7 @@ Details are in `PLATFORM.md` §2. In short:
 ## 3. Events
 
 - **Transport inside a cell**: a regional Pub/Sub topic per product (`suite-events-<product>`) with a message
-  storage policy limited to the cell's region and regional endpoints only. Subscribers in other products of the
+  storage policy limited to the cell's region, `enforceInTransit` on, and regional endpoints only. Subscribers in other products of the
   same cell get push delivery to an authenticated endpoint. Nothing crosses cells.
 - **Format**: CloudEvents 1.0 (JSON). `type` is `com.thapsus.<product>.<entity>.<verb>.v<major>`, for example
   `com.thapsus.finance.invoice.paid.v1`. `subject` is the record id; `data` holds the tenant id, the suite
@@ -93,6 +93,7 @@ sold on its own.
 | Organisation structure: departments, teams, reporting lines, work locations | HR | Finance mirrors departments as a dimension; CRM uses teams for sharing and territories; ERP reads |
 | Employees: name, work contact, job, department, cost centre, manager, start and leaving dates, employee number | HR | Finance: payees for expenses and payroll, approvers; CRM: users and teams; ERP: workers, labour costing; Care: as in Care's ADR-0126 |
 | Leavers | HR | Every product ends access at the end of the leaving date (Thapsus ID ends sessions in all products) |
+| Employee bank details (for expense reimbursement and, later, payroll) | HR, in its encrypted vault | Finance reads them through a separate, narrow partner scope, audited on both sides; without HR, Finance holds them in its own vault |
 | Pay rates, pay periods, pay inputs (hours, absences, starters, leavers) | HR (care shifts and pay units from Care, as ADR-0126 and ADR-0131) | Finance's UK payroll (later phase) reads pay inputs and returns results |
 | Payroll results: gross-to-net, payslips, RTI submissions, payroll journal | Finance (UK payroll, later phase), or the customer's external payroll | HR publishes payslips to employees; Finance posts the payroll journal |
 | Customers (accounts) and their contacts | CRM | Finance owns credit limit, credit hold, payment terms, tax status and balance on the same record; ERP owns ship-to addresses, delivery and packing preferences |
@@ -182,7 +183,9 @@ pay. Its existing Xero, CSV and SFTP connectors stay for customers who use other
 
 - **App switcher and deep links** from the shared shell (`DESIGN_SYSTEM.md` §6).
 - **Embedded summary cards**: a product shows a small read-only card from another product inside its own
-  pages, fetched over the API with the viewer's permissions (for example the invoices and balance on a CRM
+  pages. The owning product returns a small server-driven card (title key, fields, actions, deep link) that the
+  shared shell renders with shared components, so no product embeds another product's code. Cards are fetched over
+  the API with the viewer's permissions (for example the invoices and balance on a CRM
   account, or the deal on an ERP sales order). The card links to the full record in the owning product.
 - **Suite inbox**: approvals and tasks from every product in one list, each opening in its own product.
 - **Suite search** (later): a federated query to each product's search endpoint in the same cell, merged and

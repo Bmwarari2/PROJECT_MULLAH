@@ -69,10 +69,41 @@ The same model as Thapsus-HR's ADR-0248, generalised:
   availability off clears customers' choices in the same transaction.
 - Facts (model availability per region, ML-processing location, retirement dates) are re-checked every quarter.
 
-## 4. Regional availability
+## 4. Regional availability (checked 2026-11-07)
 
-What can run where, checked on 2026-11-07, is in `RESEARCH_PLATFORM.md` §3. Products plan features so that each
-has a deterministic fallback in a cell where no suitable model is available in-region.
+Vertex AI was renamed the **Gemini Enterprise Agent Platform** in April 2026; the regional API hosts
+(`{region}-aiplatform.googleapis.com`) are unchanged. Details and sources: `RESEARCH_PLATFORM.md` §3.3.
+
+| Cell | Generation and chat | Document extraction | Embeddings (retrieval) | Where processing happens |
+| --- | --- | --- | --- | --- |
+| UK (europe-west2) | Gemini 3.5 Flash; Gemini 4 Argon for harder tasks | Gemini 3.5 Flash structured output; Document AI Form Parser for forms and tables | `text-multilingual-embedding-002` | In the UK for these models. **No Claude model has a London endpoint.** Claude for UK customers only through HR's existing pattern: an explicit, audited, customer-chosen opt-in to europe-west1 (Belgium) after legal review (HR ADR-0248) |
+| EU (europe-west3) | Gemini 3.5 Flash; Claude Sonnet 4.6 in europe-west1 (Belgium) by opt-in, as HR | Gemini 3.5 Flash | `gemini-embedding-001` or `text-multilingual-embedding-002` | In Germany for Gemini 3.5 Flash; EU for the others |
+| US (us-east5) | Claude Sonnet 4.6 or Gemini 2.5 Pro / 2.5 Flash | Gemini 2.5 Flash or Pro | `gemini-embedding-001` | Within the US multi-region boundary, not pinned to Ohio (stated in words, as HR does) |
+
+Consequences for the design:
+- **Retrieval uses pgvector in the product's own database**, not Google's RAG Engine; Agent Runtime, Memory Bank,
+  Sessions and Sandboxes are outside Google's data-location commitments and are not used for customer data.
+- **Document capture** uses in-region Gemini structured extraction, Document AI Form Parser where it exists
+  (europe-west2 and europe-west3; nothing in us-east5; its OCR is Preview only), and a CPU-only self-hosted OCR
+  service on Cloud Run as the fallback (Cloud Run has no GPUs in the three cell regions).
+- **Newer models are not regional.** Claude models after Sonnet 4.6 and the newest Gemini models run only on global
+  or multi-region endpoints, which the suite forbids. Every feature therefore has an evaluation suite that lets it
+  switch model per cell without code changes, and the model map is re-checked every quarter (Haiku 4.5, for example,
+  has a retirement floor of 7 December 2026).
+
+## 4a. Regulation that shapes the AI features
+
+- **EU AI Act** as amended by the AI Omnibus, Regulation (EU) 2026/1744 (in force 27 July 2026): Article 50
+  transparency (tell people they are dealing with AI; mark generated content) applies from 2 August 2026, with a
+  grace period to 2 December 2026 for machine-readable marking in systems already on the market; Annex III
+  high-risk obligations (employment, credit scoring of individuals and others) from **2 December 2027**. Emotion
+  recognition in the workplace has been prohibited since 2 February 2025.
+- **UK**: the Data (Use and Access) Act 2025 replaced UK GDPR Article 22 with Articles 22A–22D (commenced 5 February
+  2026): solely automated significant decisions need safeguards (information, representations, human review). The
+  suite keeps a person in every such decision by default.
+- **US**: California's rules on automated decision-making technology apply from 1 January 2027; Colorado's
+  replacement law (SB 26-189) from 1 January 2027; NYC Local Law 144 for hiring tools. None of the planned features
+  makes consequential decisions about people.
 
 ## 5. Features by product
 

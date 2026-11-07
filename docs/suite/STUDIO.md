@@ -52,17 +52,35 @@ and a task and workflow engine. Studio extracts these into `@thapsus-suite/studi
   HR's sandboxes do), change configuration there, and **promote a configuration package** to production. A
   package is versioned, shows a diff before it is applied, and can be rolled back. Every change is audited.
 - **Export and import of configuration** as a versioned JSON document, so a partner can move a setup between
-  clients and a client can keep it in their own repository.
+  clients and a client can keep it in their own repository. This is also a legal requirement: under the EU Data
+  Act, the "exportable data" a customer can take when switching provider includes metadata created by its use of
+  the service, which covers its configuration.
+- **Change sets and replay.** Every edit goes into a draft change set; publishing validates it (schema, CEL type
+  checks, dependencies, permission references, cost budget), shows a diff and applies it in one transaction.
+  Before every Thapsus release, CI replays each tenant's compiled configuration (no data) against the new schema,
+  so a release that would break a customer's rule is caught before deployment. Customers get an upgrade impact
+  report listing where their override masks a Thapsus change.
 
 ## 3. The expression language
 
 Formulas, validation rules, conditions, visibility rules and approval rules all use one expression
 language. The choice is the **Common Expression Language (CEL)**, a Google specification that is not
-Turing-complete, has no side effects, evaluates in time linear in the expression size, is type-checked before it
-runs, and has maintained JavaScript implementations. Studio adds a typed function library (dates in the
-tenant's time zone, money in minor units, text, lists, lookups to related records) and a cost limit on every
-evaluation. The research behind the choice, the alternatives (JSONLogic, a custom grammar) and the library
-choice are in `RESEARCH_PLATFORM.md` §1.
+Turing-complete, has no side effects and is type-checked before it runs. It is used in Kubernetes admission
+policies and Google Cloud IAM conditions.
+
+- **Library**: `@marcbachmann/cel-js` (MIT, zero dependencies, typed environments, custom functions, structural
+  limits), with `@bufbuild/cel` (Apache-2.0) as the alternative if conformance matters more than speed. The
+  applicable CEL conformance tests run in CI.
+- **Storage**: the source text and the checked syntax tree are both stored; the visual rule builder emits CEL, so
+  there is one runtime.
+- **Cost**: the JavaScript libraries offer structural limits only, so Studio adds an estimator (node count times
+  declared maximum collection sizes, the cel-go approach) with a budget per plan, checked when a rule is published,
+  plus caps on bound list and string sizes and a wall-clock guard for bulk evaluation such as imports.
+- **Deterministic function library**: never `now()` (the request time is injected); dates through the shared time
+  utilities with an explicit IANA zone; money in minor units with the currency checked; no locale formatting inside
+  expressions.
+
+The comparison with JSONLogic, Power Fx and embedded JavaScript is in `RESEARCH_PLATFORM.md` §1.5.
 
 Admins never type CEL directly unless they want to: the editor offers a builder (field, operator, value) that
 writes the expression, and shows the expression for power users. Expressions are checked against the record's
@@ -85,11 +103,18 @@ product, as it already is for Thapsus Care.
 ## 5. How it is stored
 
 - **Custom fields** live in a `custom jsonb` column on each standard table, validated against the tenant's field
-  definitions on write. Fields that a tenant filters or sorts on are indexed with expression indexes created by
-  a background job (named per tenant and field, within limits), and GIN indexes cover containment queries. This
-  keeps forced row-level security and audit unchanged, because the data stays in the same row.
-- **Custom objects** live in shared `custom_records` tables partitioned by tenant, with the same `jsonb` and
-  indexing approach, typed relationship tables and full RLS.
+  definitions on write, with a GIN index for containment queries. Fields flagged filterable, sortable or unique
+  also write a row, in the same transaction, to a typed **index-slot table** (`custom_field_index`: text, number,
+  date, timestamp and reference columns, each with b-tree indexes leading with `tenant_id` and the field). This gives
+  range queries, sorting and uniqueness for any tenant without per-tenant DDL. Thousands of per-tenant partial
+  indexes scale badly and are avoided; the largest tenants move to a dedicated database instead. This keeps forced
+  row-level security and audit unchanged, because every table is tenant-scoped.
+- **Sensitive custom fields** (health, diversity, immigration, bank or tax data) never go in `custom jsonb`: a field
+  must carry a classification, and Studio stores sensitive ones in the encrypted vault with per-access audit.
+- **Custom objects** live in one generic `custom_record` table per product database (`(tenant_id, id)` keys,
+  `jsonb` values, the same index slots), with typed relationship tables and full RLS.
+- **Payload caps** (for example 32 KB of custom data per row) keep updates cheap; long text and files live in their
+  own tables or in object storage.
 - **Metadata** (definitions, layouts, rules, automations) lives in versioned tables with `tenant_id`, forced
   RLS and audit, cached per tenant in memory with event-driven invalidation.
 - **No entity-attribute-value tables** for values: they make reports and indexes slow at scale.

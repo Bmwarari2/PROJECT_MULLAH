@@ -31,6 +31,16 @@ Order matters: H-S1 to H-S4 unblock the platform kit (Stage 0 of `SUITE_PLAN.md`
 5. Run the platform's bootstrap script (written in Stage 0, modelled on Thapsus-HR's `infra/gcp/bootstrap.sh`)
    for each project; it creates the deploy identities and workload identity federation for GitHub.
 
+## H-S3a Assured Workloads and Google account team
+
+1. In each cell folder, create an Assured Workloads folder with the free **UK, EU or US Data Boundary** control
+   package, as a second guard-rail next to the location policy (`PLATFORM.md` §5.1).
+2. Ask the Google Cloud account team to confirm in writing: the in-UK ML processing of Gemini 3.5 Flash and Gemini
+   4 Argon on europe-west2; whether Claude Sonnet 4.6 on europe-west1 processes in Belgium or across the EU; and
+   any roadmap for a Claude endpoint in europe-west2 or europe-west3. Record the answers in `AI.md` §4.
+3. Note for Thapsus-HR: Cloud Scheduler and Cloud Tasks are not offered in us-east5, so HR's US cell needs its
+   scheduler replaced before that cell is deployed (lead session).
+
 ## H-S4 Domains
 
 1. Choose the suite domain (Thapsus-HR's domain is also still open: `THAPSUS_HR_DOMAIN`). Recommended: one
@@ -55,7 +65,12 @@ Order matters: H-S1 to H-S4 unblock the platform kit (Stage 0 of `SUITE_PLAN.md`
 1. Instruct a solicitor (UK) and, before EU and US launch, counsel there, to review: terms of service per product
    and for bundles, the data processing agreement per region, the sub-processor lists, the AI terms
    (`AI.md`), and the EU Data Act switching terms.
-2. Record each approval date in the product's `docs/HUMAN_TODO.md`; nothing marked "for legal review" goes to a
+2. **EU Data Act, by 12 January 2027** (before any EU customer): customer contracts need a notice period of at
+   most two months, a 30-day transition, at least 30 days to retrieve data, an exhaustive list of exportable data
+   (including configuration), erasure afterwards, and no switching charges.
+3. Decide where the company's EU main establishment is for NIS2 (SaaS is a cloud computing service in its Annex I)
+   once the medium-size threshold is reached, and whether UK NIS registration with the ICO applies.
+4. Record each approval date in the product's `docs/HUMAN_TODO.md`; nothing marked "for legal review" goes to a
    customer before it.
 
 ## H-S8 Security certification

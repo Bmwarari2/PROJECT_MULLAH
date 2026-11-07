@@ -160,7 +160,9 @@ These take calendar time that code cannot shorten. Each product's `docs/HUMAN_TO
 | Regulatory scope (EU e-invoicing differs per country) | EU launch slips | Country-by-country packs on one e-invoicing framework; a certified Peppol and clearance partner instead of building every national integration; publish coverage per country |
 | ERP breadth across four industries | Shallow product | Shared core first; each industry as a Studio solution pack with its own acceptance criteria; launch with wholesale first and add the others one by one |
 | Design convergence disrupts HR and Care | Visual regressions | Token bridge with visual diff review; no accent change; staged adoption |
-| AI regional availability on Google Cloud | Features unavailable in some cells | Region map with legal holds (as HR ADR-0248); deterministic non-AI path for every feature |
+| AI regional availability on Google Cloud | No Claude model in London or Frankfurt; newer models are global or multi-region only; regional models retire | Region map with legal holds (as HR ADR-0248); Gemini in-region in the UK and EU; per-feature evaluation suites so a feature can change model per cell; deterministic non-AI path for every feature (`AI.md` §4) |
+| Google services missing in a cell region | Cloud Scheduler and Cloud Tasks are not offered in us-east5 (checked 2026-11-07); the US cell would fail to deploy them | In-cell scheduler on a Cloud Run worker pool and a PostgreSQL-backed queue in every product (`PLATFORM.md` §5.3). **Thapsus-HR's US cell is affected today** and has been told through the lead session |
+| EU Data Act switching rules | From 12 January 2027 no switching charges; contracts need notice, transition, retrieval and export terms; configuration counts as exportable data | Full export, including configuration, in every product's Phase 0 acceptance; contract terms through legal review (HUMAN_TODO_SUITE H-S7) |
 | Cost of many Cloud SQL instances | Spend above plan | Shared suite projects; right-sized staging; deploy EU and US production cells only when the first customer there signs; ask before adding recurring cost |
 
 ## 8. How the build is run
@@ -185,4 +187,9 @@ These take calendar time that code cannot shorten. Each product's `docs/HUMAN_TO
 | `STUDIO.md` | No-code customisation for clients |
 | `AI.md` | Optional AI features and their guardrails |
 | `DESIGN_SYSTEM.md` | One UI across all products |
+| `HUMAN_TODO_SUITE.md` | Steps only a person can take for the whole suite |
 | `RESEARCH_PLATFORM.md` | Research behind the platform choices, with sources |
+
+Each product repository adds its own `docs/PLAN.md`, `docs/FEATURES.md`, `docs/BUILD_BRIEF.md` (draft),
+`docs/RESEARCH.md`, `docs/DECISIONS.md` and `docs/HUMAN_TODO.md`. Thapsus-HR and Thapsus Care have their own plans for
+joining the suite: `PROJECT_KAREN/docs/SUITE_INTEGRATION_PLAN.md` and `ROCHE/docs/plans/thapsus-suite.md`.

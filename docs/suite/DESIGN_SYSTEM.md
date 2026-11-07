@@ -41,7 +41,7 @@ version and upgrades through Renovate pull requests that run its visual-regressi
 
 | Package | Contents |
 | --- | --- |
-| `@thapsus-suite/tokens` | Token source in W3C Design Tokens format (JSON), built with Style Dictionary to CSS custom properties, a TypeScript object and a React Native object. Holds the base tokens, the five product accents and the contrast test. |
+| `@thapsus-suite/tokens` | Token source in the W3C Design Tokens Community Group format (stable 2025.10 release), built with Style Dictionary 5 to CSS custom properties, a TypeScript object, a React Native object and Figma variables. Four layers: primitives, semantic tokens, component tokens and modes (`color: light \| dark`, `density: comfortable \| compact` for enterprise tables, `target: standard \| large` for Care's 44 px targets). Product accents sit in a `product.*` group. Contrast tests are generated from declared text and control pairs. |
 | `@thapsus-suite/ui` | React components on Radix primitives, restyled in the shadcn/ui manner (the HR component set in §6 of its DESIGN.md, plus the business patterns in §5 below). Server-safe where possible. |
 | `@thapsus-suite/shell` | The app chrome: top bar, rail, phone tab bar, module header, segmented section nav, **app switcher**, workspace and entity switcher, account menu, command palette, notifications panel, help panel, offline and staleness banners. |
 | `@thapsus-suite/charts` | KPI tile, column, bar list, donut, line, sparkline and legend in HTML/SVG, with accessible summaries and the categorical palette. |
@@ -181,6 +181,8 @@ and Care's existing app share the same tokens.
 - **Tests in every product.** The contrast test over the product accent; Playwright visual regression of key
   screens in light and dark × phone (390×844) and desktop (1440×900); axe with zero serious findings; the
   lint rules in §2; Lighthouse (mobile) ≥ 90 performance and ≥ 95 accessibility on key screens.
-- **Adoption by HR and Care** (`SUITE_PLAN.md` Stage 3): token bridge first (their variables point at the
-  shared values), then the shell and app switcher, then component swaps, each behind their visual-regression
-  suites. Neither product changes accent colour.
+- **Adoption by HR and Care** (`SUITE_PLAN.md` Stage 3): first the shared token source reproduces today's values
+  exactly and generates **compatibility exports with the old names** (HR's `tokens.ts` names, Care's `colorLight` and
+  `colorDark`), so each product switches package with no visual change; then values converge one at a time behind
+  their visual-regression suites; then the shims are removed. Then the shell and app switcher, then component swaps.
+  Neither product changes accent colour.
